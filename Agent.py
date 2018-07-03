@@ -69,7 +69,7 @@ class Agent():
                 a = actions[idx]
                 r = rewards[idx]
                 ns = states[idx+1]
-               self.memory.push(s,a,ns,r)
+                self.memory.push(s,a,ns,r)
 
         #    print(np.array(rewards).sum())
 #    @profile

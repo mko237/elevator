@@ -29,9 +29,11 @@ global_step = 0
 #@profile
 def main():
 	global global_step
-	for epoch in range(epochs):
+	#for epoch in range(epochs):
+        epoch = 0
+        while True:
 		#generate poeple with 80% probability in each floor
-		building.empty_building()
+                building.empty_building()
 		building.generate_people(add_people_prob)
 		for step in range(max_steps):
 			states = []
@@ -71,6 +73,7 @@ def main():
 			print "Epoch: %d Step: %d Average Reward: %.4f"%(epoch, step, ave_reward/float(batch_size))
 			global_step += 1
 		agent.save(global_step)
+                epoch += 1
 
 main()
 		# raw_input("enter:")
