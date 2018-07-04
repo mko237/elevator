@@ -10,14 +10,15 @@ import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, Reshape
 from keras.optimizers import Adam
-
+from keras.callbacks import ModelCheckpoint
 class Agent():
-    def __init__(self, building_height, elevator_nums, actions,
+    def __init__(self, building_height, elevator_nums, actions,weights_file=None,
         gamma=.90, epsilon=1.0, epsilon_min=0.01, epsilon_log_decay=0.9995,
         alpha=0.01, alpha_decay=0.01, batch_size=64, monitor=False, quiet=False):
 
         self.building_height = building_height
         self.elevator_nums = elevator_nums
+        self.weights_file = weights_file
         self.actions = actions
         self.memory = ReplayMemory(200000)
         self.discount_factor = .97
@@ -100,7 +101,7 @@ class Agent():
         x_batch = np.vstack(x_batch)
         y_batch = np.array(y_batch)
 
-        self.model.fit(x_batch, y_batch, batch_size=len(x_batch), epochs=1, verbose=1)
+        self.model.fit(x_batch, y_batch, batch_size=len(x_batch), epochs=1, verbose=1,callbacks=self.callbacks_list)
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
 
@@ -114,6 +115,10 @@ class Agent():
         #self.model.add(Dense(32, activation='relu'))
         self.model.add(Dense(self.elevator_nums*self.actions, activation='linear'))
         self.model.add(Reshape((self.elevator_nums,self.actions)))
+        checkpoint = ModelCheckpoint("best_weights.hdf5",verbose=1,save_best_only=False,mode='max',period=100)
+        self.callbacks_list=[checkpoint]
+        if self.weights_file:
+            self.model.load_weights(self.weights_file)
         self.model.compile(loss='mse',metrics=['mse','mae'], optimizer=Adam(lr=self.alpha, decay=self.alpha_decay))
 
 

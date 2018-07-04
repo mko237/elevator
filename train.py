@@ -48,7 +48,7 @@ def main():
 				state = building.get_state()
 				prev_people = building.get_arrived_people()
 				state_input = np.array(state).reshape(1,-1)
-                                if epoch <=  90:
+                                if epoch <=  900:
                                     step = 0
 				action = agent.get_action(state_input,step)
 				building.perform_action(action)
