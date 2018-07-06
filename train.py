@@ -19,7 +19,7 @@ add_people_prob = 0.8
 building = Building(lift_num, buliding_height, max_people_in_floor)
 
 #Agent controls each elevator
-agent = Agent(buliding_height, lift_num, 4, epsilon_log_decay=.999999999995,gamma=.4, alpha=.00000005,batch_size=256)
+agent = Agent(buliding_height, lift_num, 4, epsilon_log_decay=.999999999995,gamma=.4, alpha=.00000005,batch_size=256,weights_file='best_weights.hdf5')
 
 #The goal is to bring down all the people in the building to the ground floor
 batch_size = 500
