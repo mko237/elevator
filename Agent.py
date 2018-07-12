@@ -32,10 +32,14 @@ class Agent():
 
         self.build_model()
 #    @profile
-    def get_action(self, state,step):
+    def get_action(self, state,step,epsilon_off=False):
         #random action for each elevator
-        #return self.env.action_space.sample() if (np.random.random() <= epsilon) else np.argmax(self.model.predict(state))
-        epsilon = self.get_epsilon(step)
+        #return self.env`.action_space.sample() if (np.random.random() <= epsilon) else np.argmax(self.model.predict(state))
+        if epsilon_off:
+            epsilon = .5
+            self.epsilon=epsilon
+        else:
+            epsilon = self.get_epsilon(step)
         if np.random.random() <= epsilon:
             action = np.random.randint(0,self.actions, (self.elevator_nums))
         else:
@@ -45,7 +49,7 @@ class Agent():
         return action
 
     def get_epsilon(self, t,):
-        return max(self.epsilon_min, min(self.epsilon, 1.0 - math.log10((t + 1) * self.epsilon_decay)))
+        return max(self.epsilon_min, min(self.epsilon, 1.0 - math.log((t + 1) * self.epsilon_decay,500)))
 
     def update_memory(self, states, actions, rewards):
         batch_size = len(states) - 1
@@ -103,7 +107,8 @@ class Agent():
 
         self.model.fit(x_batch, y_batch, batch_size=len(x_batch), epochs=1, verbose=1,callbacks=self.callbacks_list)
         if self.epsilon > self.epsilon_min:
-            self.epsilon *= self.epsilon_decay
+            #self.epsilon *= self.epsilon_decay
+            pass
 
 
     def build_model(self):

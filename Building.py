@@ -103,8 +103,8 @@ class Building(object):
 					self.people_in_floors[e.curr_floor].append(p)
 			elif action[idx] == 2:
 				# print "load"
-                                if e.curr_floor != 0:
-                                    self.people_in_floors[e.curr_floor] = e.load_people(self.people_in_floors[e.curr_floor])
+                                #if e.curr_floor != 0:
+                                self.people_in_floors[e.curr_floor] = e.load_people(self.people_in_floors[e.curr_floor])
 			elif action[idx] == 1:
 				# print "up"
 				e.move_up()

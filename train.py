@@ -9,7 +9,7 @@ from Agent import Agent
 #====================================================================================
 #Building Setting
 lift_num = 1
-buliding_height = 5 
+buliding_height = 5
 max_people_in_floor = 30
 
 add_people_at_step = 25
@@ -19,12 +19,12 @@ add_people_prob = 0.8
 building = Building(lift_num, buliding_height, max_people_in_floor)
 
 #Agent controls each elevator
-agent = Agent(buliding_height, lift_num, 4, epsilon_log_decay=.999999999995,gamma=.4, alpha=.00000005,batch_size=256,weights_file='best_weights.hdf5')
+agent = Agent(buliding_height, lift_num, 4, epsilon_min=.1,epsilon_log_decay=.99995,gamma=.4, alpha=.00000005,batch_size=256,weights_file='best_weights.hdf5')
 
 #The goal is to bring down all the people in the building to the ground floor
 batch_size = 500
 epochs = 5000
-max_steps = 100
+max_steps = 700
 global_step = 0
 #@profile
 def main():
@@ -43,14 +43,15 @@ def main():
 			if step % add_people_at_step == 0:
 				building.generate_people(add_people_prob)
 
+                        people_start_amt = building.get_arrived_people()
 			for batch_idx in range(batch_size):
 				#os.system('clear')
 				state = building.get_state()
 				prev_people = building.get_arrived_people()
 				state_input = np.array(state).reshape(1,-1)
-                                if epoch <=  900:
+                                if epoch < 0:
                                     step = 0
-				action = agent.get_action(state_input,step)
+				action = agent.get_action(state_input,step,epsilon_off=False)
 				building.perform_action(action)
 				reward = building.get_reward(prev_people)
 
@@ -60,7 +61,7 @@ def main():
 
 				ave_reward += float(reward)
 				building.increment_wait_time()
-				#building.print_building(step,agent.epsilon,show_floors=True)
+				#building.print_building(step,agent.get_epsilon(step),show_floors=True)
 				# raw_input("")
 
 				# add more people if everyone in the building are moved to the ground floor
@@ -70,7 +71,10 @@ def main():
 				#print "Epoch: %d Step: %d Average Reward: %.9f"%(epoch, step, ave_reward/float(batch_size))
 			#update network here
 			agent.update_network(states, actions, rewards, step)
-			print "Epoch: %d Step: %d Average Reward: %.4f"%(epoch, step, ave_reward/float(batch_size))
+			#print "Epoch: %d Step: %d Average Reward: %.4f"%(epoch, step, ave_reward/float(batch_size))
+                        people_end_amt = building.get_arrived_people()
+                        people_batch_amt = people_end_amt - people_start_amt
+                        print "Epoch: %d Step: %d Batch Reward: %d Epsilon: %.4f"%(epoch, step, people_batch_amt, agent.get_epsilon(step))
 			global_step += 1
 		agent.save(global_step)
                 epoch += 1
