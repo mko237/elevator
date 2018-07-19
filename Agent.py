@@ -114,13 +114,15 @@ class Agent():
     def build_model(self):
         # Init model
         self.model = Sequential()
-        self.model.add(Dense(24, input_dim=self.building_height+2*self.elevator_nums, activation='relu'))
+        self.model.add(Dense(128, input_dim=self.building_height+2*self.elevator_nums, activation='relu'))
+        self.model.add(Dense(64, activation='relu'))
         self.model.add(Dense(64, activation='relu'))
         self.model.add(Dense(48, activation='relu'))
-        #self.model.add(Dense(32, activation='relu'))
+        self.model.add(Dense(48, activation='relu'))
+        self.model.add(Dense(32, activation='relu'))
         self.model.add(Dense(self.elevator_nums*self.actions, activation='linear'))
         self.model.add(Reshape((self.elevator_nums,self.actions)))
-        checkpoint = ModelCheckpoint("best_weights.hdf5",verbose=1,save_best_only=False,mode='max',period=100)
+        checkpoint = ModelCheckpoint("best_weights_128_6.hdf5",verbose=1,save_best_only=False,mode='max',period=100)
         self.callbacks_list=[checkpoint]
         if self.weights_file:
             self.model.load_weights(self.weights_file)
