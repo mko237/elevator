@@ -19,12 +19,12 @@ add_people_prob = 0.8
 building = Building(lift_num, buliding_height, max_people_in_floor)
 
 #Agent controls each elevator
-agent = Agent(buliding_height, lift_num, 4, epsilon_min=.1,epsilon_log_decay=.99995,gamma=.4, alpha=.0005,batch_size=256,weights_file='best_weights_128_6.hdf5')
+agent = Agent(buliding_height, lift_num, 4, epsilon_min=.05,epsilon_log_decay=.99995,gamma=.4, alpha=.0005,batch_size=2048,weights_file='best_weights_128_6.hdf5')
 
 #The goal is to bring down all the people in the building to the ground floor
-batch_size = 500
+batch_size = 5120
 epochs = 5000
-max_steps = 700
+max_steps = 1024
 global_step = 0
 #@profile
 def main():
@@ -74,7 +74,7 @@ def main():
 			#print "Epoch: %d Step: %d Average Reward: %.4f"%(epoch, step, ave_reward/float(batch_size))
                         people_end_amt = building.get_arrived_people()
                         people_batch_amt = people_end_amt - people_start_amt
-                        print "Epoch: %d Step: %d Batch Reward: %d Epsilon: %.4f"%(epoch, step, people_batch_amt, agent.get_epsilon(step))
+                        print "Epoch: %d Step: %d Batch Reward: %d Total Arrived: %d Epsilon: %.4f"%(epoch, step, people_batch_amt, people_end_amt, agent.get_epsilon(step))
 			global_step += 1
 		agent.save(global_step)
                 epoch += 1
