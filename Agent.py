@@ -36,7 +36,7 @@ class Agent():
         #random action for each elevator
         #return self.env`.action_space.sample() if (np.random.random() <= epsilon) else np.argmax(self.model.predict(state))
         if epsilon_off:
-            epsilon = .5
+            epsilon = .05
             self.epsilon=epsilon
         else:
             epsilon = self.get_epsilon(step)
@@ -44,8 +44,9 @@ class Agent():
             action = np.random.randint(0,self.actions, (self.elevator_nums))
         else:
             action_q_val = self.predict(state)
-            action = np.argmax(action_q_val, axis=1)
-            action = action.squeeze()
+            action = np.argmax(action_q_val, axis=2)
+            sq_ax = 0 if self.elevator_nums >1 else 1
+            action = action.squeeze(axis=sq_ax)
         return action
 
     def get_epsilon(self, t,):
@@ -122,10 +123,16 @@ class Agent():
         self.model.add(Dense(32, activation='relu'))
         self.model.add(Dense(self.elevator_nums*self.actions, activation='linear'))
         self.model.add(Reshape((self.elevator_nums,self.actions)))
-        checkpoint = ModelCheckpoint("best_weights_128_6.hdf5",verbose=1,save_best_only=False,mode='max',period=100)
-        self.callbacks_list=[checkpoint]
         if self.weights_file:
-            self.model.load_weights(self.weights_file)
+            try:
+                self.model.load_weights(self.weights_file)
+            except:
+                pass
+            weight_file = self.weights_file
+        else:
+            weight_file = "best_weights.hdf5"
+        checkpoint = ModelCheckpoint(weight_file,verbose=1,save_best_only=True,mode='max',period=100)
+        self.callbacks_list=[checkpoint]
         self.model.compile(loss='mse',metrics=['mse','mae'], optimizer=Adam(lr=self.alpha, decay=self.alpha_decay))
 
 

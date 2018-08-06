@@ -8,7 +8,7 @@ from Agent import Agent
 
 #====================================================================================
 #Building Setting
-lift_num = 1
+lift_num = 3
 buliding_height = 5
 max_people_in_floor = 30
 
@@ -19,13 +19,14 @@ add_people_prob = 0.8
 building = Building(lift_num, buliding_height, max_people_in_floor)
 
 #Agent controls each elevator
-agent = Agent(buliding_height, lift_num, 4, epsilon_min=.05,epsilon_log_decay=.99995,gamma=.4, alpha=.0005,batch_size=2048,weights_file='best_weights_128_6.hdf5')
+agent = Agent(buliding_height, lift_num, building.num_actions, epsilon_min=.05,epsilon_log_decay=.99995,gamma=.4, alpha=.0005,batch_size=2048,weights_file='best_weights_128_6(8_5).hdf5')
 
 #The goal is to bring down all the people in the building to the ground floor
 batch_size = 5120
 epochs = 5000
 max_steps = 1024
 global_step = 0
+print_building = False
 #@profile
 def main():
 	global global_step
@@ -45,7 +46,6 @@ def main():
 
                         people_start_amt = building.get_arrived_people()
 			for batch_idx in range(batch_size):
-				#os.system('clear')
 				state = building.get_state()
 				prev_people = building.get_arrived_people()
 				state_input = np.array(state).reshape(1,-1)
@@ -61,7 +61,9 @@ def main():
 
 				ave_reward += float(reward)
 				building.increment_wait_time()
-				#building.print_building(step,agent.get_epsilon(step),show_floors=True)
+                                if print_building:
+                                    os.system('clear')
+                                    building.print_building(step,agent.get_epsilon(step),show_floors=True,action=action)
 				# raw_input("")
 
 				# add more people if everyone in the building are moved to the ground floor

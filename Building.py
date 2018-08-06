@@ -18,6 +18,7 @@ class Building(object):
 
 		self.total_elevator_num = total_elevator_num
 		self.max_people_in_floor = max_people
+                self.num_actions = 5
 
 		#each elevator has max capacity of 10
 		self.elevators = []
@@ -121,7 +122,7 @@ class Building(object):
 			for p in elevator.curr_people:
 				p.wait_time+=1
 
-	def print_building(self, step,epsilon=None,show_floors=True):
+	def print_building(self, step,epsilon=None,show_floors=True,action=None):
 		if show_floors:
 			for idx in reversed(range(1,self.height)):
 				print "======================================================="
@@ -169,3 +170,5 @@ class Building(object):
 		print "Step: %d"%step
 		if epsilon:
 			print "Epsilon: %.3f"%epsilon
+		if action is not None:
+			print "Action: %s"%action
