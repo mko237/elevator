@@ -33,7 +33,11 @@ class Building(object):
 			self.floor_button.append(Switch())
 
 	def get_reward(self, prev_people):
-		res = self.get_arrived_people() - prev_people# -1
+                #energy = 0 if action ==
+		#res = self.get_arrived_people() - prev_people# -1
+		#res = (self.get_arrived_people() - prev_people)*10  - (self.get_wait_time()*.001)
+		#res = (self.get_arrived_people() - prev_people)*10  - (self.get_distance_from_max_wait_floor())
+		res = (self.get_arrived_people() - prev_people)*1  - self.get_people_to_move()
 		return res
 
 	# check number of people in ground floor
@@ -43,23 +47,55 @@ class Building(object):
 	# this function is not currently used
 	def get_wait_time(self):
 		total = 0
+		#for people in self.people_in_floors[1:]:
+		#	for p in people:
+		#		total += p.wait_time
+
+		#for elevator in self.elevators:
+		#	for p in elevator.curr_people:
+		#		total += p.wait_time
+
+                wait_time = []
 		for people in self.people_in_floors[1:]:
+                        floor_total = .1
 			for p in people:
-				total += p.wait_time
+				floor_total += p.wait_time
+                        wait_time.append(floor_total)
 
-		for elevator in self.elevators:
-			for p in elevator.curr_people:
-				total += p.wait_time
-		return total
+                wait_time = np.array(wait_time)
+                wait_time = list(wait_time/wait_time.sum())
 
+		return wait_time
+        def get_people_to_move(self):
+            num_people = self.target - len(self.people_in_floors[0])
+            return num_people
+
+        def get_distance_from_max_wait_floor(self):
+                distance = 0
+                for e in  self.elevators:
+                       distance += np.abs(e.curr_floor
+                                      - (np.argmax(self.get_wait_time())
+                                         + 1
+                                        )
+                                     )
+                return distance
 
 	# state of the building will be fed into the network as an input
+
 	def get_state(self):
 		res = [float(len(elem))/float(self.max_people_in_floor) if idx > 0 else float(len(elem))/float(self.target) for idx, elem in enumerate(self.people_in_floors)]
 
 		for e in self.elevators:
 			res.append(float(e.curr_floor)/float(self.height))
 			res.append(float(len(e.curr_people))/float(e.max_people))
+                        res.append(e.curr_floor)
+
+                for floor in self.get_wait_time():
+                    res.append(floor)
+                res.append(self.get_people_to_move())
+
+
+                self.increment_wait_time()
 		return res
 
 	# clears the building
@@ -96,7 +132,7 @@ class Building(object):
 	def perform_action(self, action):
 		for idx,e in enumerate(self.elevators):
 			if action[idx] == 4:
-                            pass # no-op
+                                pass # no-op
 			elif action[idx] == 3:
 				# print "unload"
 				res = e.unload_people(self.people_in_floors[e.curr_floor], self.max_people_in_floor)
@@ -122,7 +158,7 @@ class Building(object):
 			for p in elevator.curr_people:
 				p.wait_time+=1
 
-	def print_building(self, step,epsilon=None,show_floors=True,action=None):
+	def print_building(self, step,epsilon=None,show_floors=True,action=None,batch_num=None,random_action=None,reward=None):
 		if show_floors:
 			for idx in reversed(range(1,self.height)):
 				print "======================================================="
@@ -169,6 +205,13 @@ class Building(object):
 		print "Total # of people: %d"%self.target
 		print "Step: %d"%step
 		if epsilon:
-			print "Epsilon: %.3f"%epsilon
+			print "Epsilon: %.3f, %s "%(epsilon,random_action)
 		if action is not None:
 			print "Action: %s"%action
+		if batch_num is not None:
+			print "Batch idx: %s"%batch_num
+		if reward is not None:
+			print "Reward: %.5f"%reward
+
+                print self.get_wait_time()
+                print self.get_distance_from_max_wait_floor()
