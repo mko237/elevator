@@ -15,7 +15,7 @@ class Agent():
     def __init__(self, building_height, elevator_nums, actions,weights_file=None,
         gamma=.90, epsilon=1.0, epsilon_min=0.01, epsilon_log_decay=0.9995,
         alpha=0.01, alpha_decay=0.01, batch_size=64, monitor=False, quiet=False,
-        default_cost_max=.9,default_cost_min=.9):
+        default_cost_max=1,default_cost_min=0):
 
         self.building_height = building_height
         self.elevator_nums = elevator_nums
@@ -64,7 +64,7 @@ class Agent():
         full_reward = None
         full_reward_exp = 1
         for idx in reversed(range(batch_size)):
-            if rewards[idx] <= self.default_cost_max or rewards[idx] >= self.default_cost_min:
+            if rewards[idx] > self.default_cost_max or rewards[idx] < self.default_cost_min:
                 full_reward = rewards[idx]
                 full_reward_exp = 1
             else:
@@ -120,7 +120,7 @@ class Agent():
     def build_model(self):
         # Init model
         self.model = Sequential()
-        self.model.add(Dense(128, input_dim=self.building_height*2+3*self.elevator_nums, activation='relu'))
+        self.model.add(Dense(128, input_dim=self.building_height*2+2*self.elevator_nums, activation='relu'))
         self.model.add(Dense(64, activation='relu'))
         self.model.add(Dense(64, activation='relu'))
         self.model.add(Dense(48, activation='relu'))

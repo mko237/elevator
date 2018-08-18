@@ -34,10 +34,13 @@ class Building(object):
 
 	def get_reward(self, prev_people):
                 #energy = 0 if action ==
-		#res = self.get_arrived_people() - prev_people# -1
+		res = self.get_arrived_people() - prev_people# - 1
+		#res = (self.get_arrived_people() - prev_people) - self.get_building_capcity() # need to disable default cost in agent if used. setting a very low (negative default cost should disable
 		#res = (self.get_arrived_people() - prev_people)*10  - (self.get_wait_time()*.001)
-		#res = (self.get_arrived_people() - prev_people)*10  - (self.get_distance_from_max_wait_floor())
-		res = (self.get_arrived_people() - prev_people)*1  - self.get_people_to_move()
+		#res = (self.get_arrived_people() - prev_people)*1  - (self.get_distance_from_max_wait_floor())
+		#res = (self.get_arrived_people() - prev_people)*2*self.height  - (self.get_distance_from_max_wait_floor())-1
+		#res = (self.get_arrived_people() - prev_people)*2*self.height  - (self.get_distance_from_max_wait_floor())-1
+		#res = (self.get_arrived_people() - prev_people)*1  - self.get_people_to_move()
 		return res
 
 	# check number of people in ground floor
@@ -70,6 +73,11 @@ class Building(object):
             num_people = self.target - len(self.people_in_floors[0])
             return num_people
 
+        def get_building_capacity(self):
+            num_people = self.get_people_to_move()
+            max_people = (self.height-1)*self.max_people_in_floor
+            return float(num_people)/float(max_people)
+
         def get_distance_from_max_wait_floor(self):
                 distance = 0
                 for e in  self.elevators:
@@ -88,11 +96,10 @@ class Building(object):
 		for e in self.elevators:
 			res.append(float(e.curr_floor)/float(self.height))
 			res.append(float(len(e.curr_people))/float(e.max_people))
-                        res.append(e.curr_floor)
 
                 for floor in self.get_wait_time():
                     res.append(floor)
-                res.append(self.get_people_to_move())
+                res.append(self.get_building_capacity())
 
 
                 self.increment_wait_time()

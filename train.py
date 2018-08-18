@@ -1,5 +1,5 @@
 import numpy as np
-import os
+import os,sys
 from Building import Building
 from Agent import Agent
 
@@ -20,14 +20,19 @@ add_people_prob = 0.4
 building = Building(lift_num, buliding_height, max_people_in_floor)
 time_cost = -.0 # adding a time cost to reduce time agent spends idle
 #Agent controls each elevator
-agent = Agent(buliding_height, lift_num, building.num_actions, epsilon=.15, epsilon_min=.04,epsilon_log_decay=.99995,gamma=.4, alpha=.005,batch_size=2048,weights_file='best_weights_128_6(8_17).hdf5',default_cost_min=time_cost,default_cost_max=time_cost)
+agent = Agent(buliding_height, lift_num, building.num_actions, epsilon=.5, epsilon_min=.04,epsilon_log_decay=.99995,gamma=.4, alpha=.005,batch_size=2048,weights_file='best_weights_128_6(8_18_2).hdf5',default_cost_min=time_cost,default_cost_max=time_cost)
 
 #The goal is to bring down all the people in the building to the ground floor
-batch_size = 200
+batch_size = 500
 epochs = 5000
 max_steps = 100
 global_step = 0
-print_building = False
+
+if len(sys.argv) >= 2:
+    print_building = True
+else:
+    print_building = False
+
 #@profile
 def main():
     global global_step
@@ -60,7 +65,6 @@ def main():
                     step_reward = building.get_reward(prev_people)
                     #reward =  step_reward + np.array(rewards[:10]).sum() if step_reward > 0 else step_reward
                     reward = step_reward + time_cost
-                    
                     states.append(state)
                     actions.append(action)
                     rewards.append(reward)
