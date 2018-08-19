@@ -136,7 +136,7 @@ class Agent():
             weight_file = self.weights_file
         else:
             weight_file = "best_weights.hdf5"
-        checkpoint = ModelCheckpoint(weight_file,verbose=1,save_best_only=False,mode='max',period=100)
+        checkpoint = ModelCheckpoint(weight_file,verbose=1,save_best_only=False,mode='max',period=50)
         self.callbacks_list=[checkpoint]
         self.model.compile(loss='mse',metrics=['mse','mae'], optimizer=Adam(lr=self.alpha, decay=self.alpha_decay))
 

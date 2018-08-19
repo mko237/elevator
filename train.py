@@ -10,7 +10,7 @@ from Agent import Agent
 #Building Setting
 lift_num = 1
 buliding_height = 5
-max_people_in_floor = 300
+max_people_in_floor = 30
 
 add_people_at_step = 5
 add_people_at_batch_idx = 25
@@ -20,12 +20,12 @@ add_people_prob = 0.4
 building = Building(lift_num, buliding_height, max_people_in_floor)
 time_cost = -.0 # adding a time cost to reduce time agent spends idle
 #Agent controls each elevator
-agent = Agent(buliding_height, lift_num, building.num_actions, epsilon=.5, epsilon_min=.04,epsilon_log_decay=.99995,gamma=.4, alpha=.005,batch_size=2048,weights_file='best_weights_128_6(8_18_2).hdf5',default_cost_min=time_cost,default_cost_max=time_cost)
+agent = Agent(buliding_height, lift_num, building.num_actions, epsilon=.5, epsilon_min=.04,epsilon_log_decay=.599995,gamma=.4, alpha=.005,batch_size=2048,weights_file='best_weights_128_6(8_18_2).hdf5',default_cost_min=time_cost,default_cost_max=time_cost)
 
 #The goal is to bring down all the people in the building to the ground floor
 batch_size = 500
 epochs = 5000
-max_steps = 100
+max_steps = 1000
 global_step = 0
 
 if len(sys.argv) >= 2:

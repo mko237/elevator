@@ -36,13 +36,15 @@ class Building(object):
                 #energy = 0 if action ==
 		res = self.get_arrived_people() - prev_people# - 1
 		#res = (self.get_arrived_people() - prev_people) - self.get_building_capcity() # need to disable default cost in agent if used. setting a very low (negative default cost should disable
+		res = (self.get_arrived_people() - prev_people)*(1+self.get_building_capacity()) - (self.max_people_in_floor+self.get_building_capacity()) # need to disable default cost in agent if used. setting a very low (negative default cost should disable
 		#res = (self.get_arrived_people() - prev_people)*10  - (self.get_wait_time()*.001)
 		#res = (self.get_arrived_people() - prev_people)*1  - (self.get_distance_from_max_wait_floor())
 		#res = (self.get_arrived_people() - prev_people)*2*self.height  - (self.get_distance_from_max_wait_floor())-1
 		#res = (self.get_arrived_people() - prev_people)*2*self.height  - (self.get_distance_from_max_wait_floor())-1
 		#res = (self.get_arrived_people() - prev_people)*1  - self.get_people_to_move()
 		return res
-
+        def get_arrived_people_wait_time(self):
+            pass
 	# check number of people in ground floor
 	def get_arrived_people(self):
 		return len(self.people_in_floors[0])
@@ -121,15 +123,16 @@ class Building(object):
 			if np.random.random() < prob and len(self.people_in_floors[floor_num]) < self.max_people_in_floor:
 				people = np.random.randint(1,6)
 				if len(self.people_in_floors[floor_num]) + people > self.max_people_in_floor:
-					people = self.max_people_in_floor - (len(self.people_in_floors[floor_num]) + people)
+					people = self.max_people_in_floor - len(self.people_in_floors[floor_num])
 
 				tmp_list = []
 				for p in range(people):
 					tmp_list.append(Passenger())
+
 				self.people_in_floors[floor_num] += tmp_list
 				self.target += people
 
- 				# if np.random.random() < 0.5 and floor_num < self.height:
+                                # if np.random.random() < 0.5 and floor_num < self.height:
 				# 	self.floor_button[floor_num].up = "^"
 				# elif floor_num > 0:
 				# 	self.floor_button[floor_num].down = "v"
